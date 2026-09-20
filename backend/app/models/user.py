@@ -14,7 +14,10 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         sa.String(320), unique=True, nullable=False, index=True
     )
-    password_hash: Mapped[str] = mapped_column(sa.String(255), nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(
+    sa.String(255),
+    nullable=True,
+)
     created_at = mapped_column(sa.DateTime, server_default=sa.func.now(), nullable=False)
     updated_at = mapped_column(
         sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False

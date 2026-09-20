@@ -12,7 +12,7 @@ export function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login, error: authError } = useAuth();
+  const { login, googleLogin, error: authError } = useAuth();
   useTheme();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -39,8 +39,40 @@ export function Login() {
   };
 
   const handleGoogleAuth = () => {
-    console.log('Google OAuth clicked');
-  };
+  setError('');
+  setLoading(true);
+
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    setError('Google authentication is not configured');
+    setLoading(false);
+    return;
+  }
+
+  if (!window.google) {
+    setError('Google authentication is still loading. Please try again.');
+    setLoading(false);
+    return;
+  }
+
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    callback: async (response) => {
+      const ok = await googleLogin(response.credential);
+
+      setLoading(false);
+
+      if (ok) {
+        navigate('/');
+      } else {
+        setError(authError || 'Google authentication failed');
+      }
+    },
+  });
+
+  window.google.accounts.id.prompt();
+};
 
   return (
     <div className="min-h-[100dvh] w-full flex flex-col md:flex-row bg-background font-sans overflow-x-hidden">

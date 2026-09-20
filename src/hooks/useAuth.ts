@@ -79,6 +79,30 @@ export const useAuth = () => {
     }
   }, []);
 
+  const googleLogin = useCallback(async (credential: string) => {
+  setError(null);
+
+  try {
+    const response = await apiFetch<AuthResponse>('/api/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential }),
+      auth: false,
+    });
+
+    tokenStore.set(response.access_token);
+    setUser(response.user);
+
+    return true;
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : 'Google authentication failed'
+    );
+    return false;
+  }
+}, []);
+
   const logout = useCallback(async () => {
     try {
       if (tokenStore.get()) await apiFetch('/api/auth/logout', { method: 'POST' });
@@ -88,12 +112,13 @@ export const useAuth = () => {
   }, []);
 
   return useMemo(() => ({
-    user,
-    isLoading,
-    error,
-    isAuthenticated: !!user,
-    login,
-    signup,
-    logout,
-  }), [user, isLoading, error, login, signup, logout]);
-};
+  user,
+  isLoading,
+  error,
+  isAuthenticated: !!user,
+  login,
+  signup,
+  googleLogin,
+  logout,
+}), [user, isLoading, error, login, signup, googleLogin, logout]);
+}

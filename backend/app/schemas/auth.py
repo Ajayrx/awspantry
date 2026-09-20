@@ -1,6 +1,12 @@
+from app.core.config import get_settings
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.schemas.user import UserOut
+
+class GoogleAuthRequest(BaseModel):
+    """Google Identity Services ID token."""
+
+    credential: str = Field(min_length=1)
 
 
 class RegisterRequest(BaseModel):
