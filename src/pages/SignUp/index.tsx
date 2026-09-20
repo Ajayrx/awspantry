@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, Mail, Lock, User } from 'lucide-react';
 import { AuthIllustration, MobileAuthHeader } from '../Login/AuthIllustration';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../hooks/useAuth';
 
 export function SignUp() {
   const [name, setName] = useState('');
@@ -11,9 +12,11 @@ export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { signup, error: authError } = useAuth();
   useTheme();
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -35,10 +38,13 @@ export function SignUp() {
     }
     
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('Frontend validation passed. Ready for auth team integration.', { name, email });
-    }, 1000);
+    const ok = await signup(name, email, password);
+    setLoading(false);
+    if (ok) {
+      navigate('/');
+    } else {
+      setError(authError || 'Could not create account');
+    }
   };
 
   const handleGoogleAuth = () => {

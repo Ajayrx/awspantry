@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, Mail, Lock } from 'lucide-react';
 import { AuthIllustration, MobileAuthHeader } from './AuthIllustration';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../hooks/useAuth';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -10,9 +11,11 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login, error: authError } = useAuth();
   useTheme();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -26,10 +29,13 @@ export function Login() {
     }
     
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('Frontend validation passed. Ready for auth team integration.', { email });
-    }, 1000);
+    const ok = await login(email, password);
+    setLoading(false);
+    if (ok) {
+      navigate('/');
+    } else {
+      setError(authError || 'Invalid email or password');
+    }
   };
 
   const handleGoogleAuth = () => {

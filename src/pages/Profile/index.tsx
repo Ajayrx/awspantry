@@ -3,10 +3,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/ui/Button';
 import { Check, LogOut, Users, Bell, ShoppingBag, ChefHat, ChevronRight } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useNavigate } from 'react-router-dom';
 
 export function Profile() {
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   const colors: { id: ThemeColor, hex: string, name: string }[] = [
     { id: 'green', hex: '#10b981', name: 'Green' },
@@ -147,7 +149,10 @@ export function Profile() {
       </section>
       
       <section className="pt-2">
-         <button className="w-full neo-card p-5 flex items-center justify-center gap-2 text-red-500 font-bold hover:bg-red-50 transition-colors">
+         <button
+           className="w-full neo-card p-5 flex items-center justify-center gap-2 text-red-500 font-bold hover:bg-red-50 transition-colors"
+           onClick={async () => { await logout(); navigate('/login'); }}
+         >
             <LogOut className="w-5 h-5" />
             <span className="text-lg">Sign Out</span>
          </button>
